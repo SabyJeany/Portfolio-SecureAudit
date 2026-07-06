@@ -1,5 +1,15 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+*.db
+
+# Node
 node_modules/
 dist/
-.env
-__pycache__/
-venv/
+.vite/
+
+# OS
+.DS_Store
+Thumbs.db
