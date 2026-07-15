@@ -30,8 +30,6 @@ class ScoreCalculator:
         label = calculator.get_score_label(score)
     """
 
-    # Weight of each severity level on the score
-    # Higher weight = bigger negative impact on score
     SEVERITY_WEIGHTS = {
         "critical": 25,
         "medium": 10,
