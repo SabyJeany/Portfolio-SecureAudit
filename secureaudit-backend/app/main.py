@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.database import engine, Base
+from app.routers import auth, scans
 
-app = FastAPI(title="SecureAudit API", version="1.0.0")
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="SecureAudit API",
+    description="REST API for the SecureAudit web security audit platform ",
+    version="1.0.0",
+)
+
 
 # CORS — enables the React front-end (localhost:5173) to communicate with the back-end
 app.add_middleware(
@@ -11,6 +20,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register the auth router # All routes in auth.py will be available
+app.include_router(auth.router)
+app.include_router(scans.router)
+
 
 @app.get("/")
 def root():
