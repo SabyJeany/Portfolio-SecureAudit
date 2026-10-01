@@ -26,6 +26,7 @@ function ScanPage() {
   // Pre-fill URL if coming from LandingPage
   const [url, setUrl] = useState(location.state?.url || '')
   const [loading, setLoading] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [error, setError] = useState('')
   const [scanResult, setScanResult] = useState(null)
 
@@ -57,6 +58,22 @@ function ScanPage() {
       setError('Scan failed. Please check the URL and try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  /**
+   * Handle PDF download.
+   * Calls GET /api/reports/{id} and triggers browser download.
+   */
+  const handleDownloadPdf = async () => {
+    if (!scanResult) return
+    setPdfLoading(true)
+    try {
+      await scanService.downloadPdf(scanResult.id, token)
+    } catch (err) {
+      setError('Could not generate PDF. Please try again.')
+    } finally {
+      setPdfLoading(false)
     }
   }
 
@@ -153,11 +170,27 @@ function ScanPage() {
             </div>
           </div>
 
-          {/* Findings list */}
+          {/* Findings list + PDF button */}
           <div>
-            <h2 className="text-lg font-medium text-white mb-4">
-              Detailed Findings ({scanResult.findings?.length || 0} checks)
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-white">
+                Detailed Findings ({scanResult.findings?.length || 0} checks)
+              </h2>
+              <button
+                onClick={handleDownloadPdf}
+                disabled={pdfLoading}
+                className="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white text-sm px-4 py-2 rounded-lg transition flex items-center gap-2"
+              >
+                {pdfLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>📄 Download PDF</>
+                )}
+              </button>
+            </div>
             <div className="space-y-3">
               {scanResult.findings?.map((finding) => (
                 <FindingCard

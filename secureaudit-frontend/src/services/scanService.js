@@ -64,5 +64,31 @@ export const scanService = {
       headers: { Authorization: `Bearer ${token}` }
     })
     return response.data
+  },
+
+  /**
+   * Download PDF report for a scan.
+   * @param {number} scanId - ID of the scan
+   * @param {string|null} token - JWT token (optional)
+   */
+  async downloadPdf(scanId, token = null) {
+    const headers = token
+      ? { Authorization: `Bearer ${token}` }
+      : {}
+
+    const response = await api.get(`/reports/${scanId}`, {
+      headers,
+      responseType: 'blob'
+    })
+
+    // Create download link and trigger browser download
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `secureaudit-report-${scanId}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
   }
 }
